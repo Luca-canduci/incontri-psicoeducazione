@@ -1,2 +1,0 @@
-# incontri-psicoeducazione
-Materiale psicoeducazione 
