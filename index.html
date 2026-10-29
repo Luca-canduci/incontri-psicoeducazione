@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Percorso di Psicoeducazione AuDHD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+        }
+        .glass-panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+        }
+        .locked {
+            opacity: 0.6;
+            filter: grayscale(0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="bg-indigo-600 text-white p-6 shadow-md">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-3xl font-bold flex items-center justify-center gap-3">
+                <i class="fa-solid fa-brain"></i> Il Tuo Percorso
+            </h1>
+            <p class="text-indigo-200 text-sm mt-2">Spazio di psicoeducazione, risorse e approfondimenti dedicati</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto w-full p-6 my-auto">
+        <div class="glass-panel rounded-2xl p-8 mb-8 text-center bg-white">
+            <h2 class="text-2xl font-bold text-slate-800 mb-3">Benvenuta nel tuo portale</h2>
+            <p class="text-slate-600 leading-relaxed max-w-2xl mx-auto">
+                Qui troverai la raccolta degli incontri e degli esercizi settimanali. Ogni modulo è pensato per offrirti una mappa chiara e senza fretta del tuo funzionamento.
+            </p>
+        </div>
+
+        <h3 class="text-xl font-bold text-slate-800 mb-4 px-2 flex items-center gap-2">
+            <i class="fa-solid fa-folder-open text-indigo-600"></i> Moduli e Attività
+        </h3>
+
+        <!-- Grid dei Link -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- Incontro 1 -->
+            <a href="web_app_incontro_1.html" class="glass-panel p-6 rounded-2xl flex items-center gap-4 border-l-4 border-indigo-500 group">
+                <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-1"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">Incontro 1</h4>
+                    <p class="text-sm text-slate-500">Cos'è l'ADHD e Miti vs Realtà</p>
+                </div>
+                <i class="fa-solid fa-chevron-right text-slate-400"></i>
+            </a>
+
+            <!-- Homework 1 -->
+            <a href="homework_incontro_1.html" class="glass-panel p-6 rounded-2xl flex items-center gap-4 border-l-4 border-emerald-500 group">
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-pen-nib"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-bold text-slate-800 group-hover:text-emerald-600 transition-colors">Homework 1</h4>
+                    <p class="text-sm text-slate-500">I Miei "Ah-Ah!" Moments</p>
+                </div>
+                <i class="fa-solid fa-chevron-right text-slate-400"></i>
+            </a>
+
+            <!-- Incontro 2 (Predisposto) -->
+            <a href="web_app_incontro_2.html" class="glass-panel p-6 rounded-2xl flex items-center gap-4 border-l-4 border-indigo-500 group">
+                <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-2"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">Incontro 2</h4>
+                    <p class="text-sm text-slate-500">Autismo al Femminile e Masking</p>
+                </div>
+                <i class="fa-solid fa-chevron-right text-slate-400"></i>
+            </a>
+
+            <!-- Homework 2 (Predisposto) -->
+            <a href="homework_incontro_2.html" class="glass-panel p-6 rounded-2xl flex items-center gap-4 border-l-4 border-emerald-500 group">
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-pen-nib"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-bold text-slate-800 group-hover:text-emerald-600 transition-colors">Homework 2</h4>
+                    <p class="text-sm text-slate-500">Radar del Masking e Sensoriale</p>
+                </div>
+                <i class="fa-solid fa-chevron-right text-slate-400"></i>
+            </a>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400 mt-12">
+        <p>Spazio clinico protetto • Navigazione guidata</p>
+    </footer>
+
+</body>
+</html>
