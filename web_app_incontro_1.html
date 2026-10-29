@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incontro 1 - Psicoeducazione AuDHD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.03);
+        }
+        .resonance-chip.selected {
+            background-color: #eef2ff;
+            border-color: #6366f1;
+            color: #4338ca;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
+        }
+        .myth-card {
+            transition: all 0.25s ease;
+        }
+        .myth-card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* ============================================================================
+           MODALITÀ STAMPA E PDF COMPLETO (Tutte le 4 schede e i 3 pilastri aperti)
+           ============================================================================ */
+        body.pdf-export-mode {
+            height: auto !important;
+            overflow: visible !important;
+            background: #ffffff !important;
+        }
+        body.pdf-export-mode #appWrapper {
+            overflow: visible !important;
+            display: block !important;
+        }
+        body.pdf-export-mode #mainScrollArea {
+            overflow: visible !important;
+            padding: 16px !important;
+        }
+        body.pdf-export-mode .tab-content {
+            display: block !important;
+            opacity: 1 !important;
+            transform: none !important;
+            margin-bottom: 2.5rem !important;
+            padding-bottom: 1.5rem !important;
+            border-bottom: 2px dashed #cbd5e1 !important;
+        }
+        body.pdf-export-mode .pillar-panel {
+            display: block !important;
+            margin-bottom: 1.5rem !important;
+            padding-top: 1rem !important;
+            border-top: 1px solid #e2e8f0 !important;
+        }
+        body.pdf-export-mode .no-print {
+            display: none !important;
+        }
+        body.pdf-export-mode .print-only-header {
+            display: block !important;
+        }
+        body.pdf-export-mode .glass-panel {
+            box-shadow: none !important;
+            border: 1px solid #cbd5e1 !important;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 12mm;
+            }
+            body {
+                height: auto !important;
+                overflow: visible !important;
+                background: #ffffff !important;
+                color: #0f172a !important;
+            }
+            #appWrapper {
+                display: block !important;
+                overflow: visible !important;
+            }
+            #mainScrollArea {
+                overflow: visible !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only-header {
+                display: block !important;
+            }
+            /* Forza l'apertura di tutte le 4 schede principali e dei 3 pilastri interni */
+            .tab-content {
+                display: block !important;
+                opacity: 1 !important;
+                transform: none !important;
+                margin-bottom: 24px !important;
+                padding-bottom: 16px !important;
+                border-bottom: 2px solid #e2e8f0 !important;
+            }
+            .pillar-panel {
+                display: block !important;
+                margin-bottom: 16px !important;
+                padding-top: 12px !important;
+                border-top: 1px solid #e2e8f0 !important;
+            }
+            .glass-panel {
+                box-shadow: none !important;
+                border: 1px solid #cbd5e1 !important;
+                break-inside: avoid;
+                page-break-inside: avoid;
+                margin-bottom: 14px !important;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden bg-slate-50">
+
+    <!-- Toast di notifica -->
+    <div id="toastBox" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-700 no-print">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toastText" class="text-xs md:text-sm font-medium">Operazione completata</span>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-indigo-700 via-indigo-600 to-violet-700 text-white px-6 py-4 shadow-md z-20 shrink-0 no-print">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
+            <div>
+                <div class="flex items-center gap-2.5">
+                    <span class="bg-white/20 p-2 rounded-xl backdrop-blur-sm">
+                        <i class="fa-solid fa-brain text-xl text-indigo-100"></i>
+                    </span>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold tracking-tight">Percorso di Psicoeducazione AuDHD</h1>
+                        <p class="text-indigo-100 text-xs md:text-sm font-medium">Incontro 1: Comprendere l'ADHD nell'Adulto, De-stigmatizzazione e Rilettura della Storia</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Azioni Rapide: Contatore spunti risonanti + Stampa/PDF Completo -->
+            <div class="flex flex-wrap items-center gap-2.5 self-end lg:self-auto">
+                <div class="flex items-center gap-2 bg-indigo-900/40 border border-indigo-400/30 px-3.5 py-2 rounded-xl text-xs md:text-sm">
+                    <i class="fa-solid fa-bookmark text-amber-300"></i>
+                    <span>Spunti in cui ti rivedi: <strong id="resonanceCount" class="text-white font-bold">0</strong></span>
+                </div>
+
+                <button id="btnDownloadFullPdf" onclick="exportFullStaticPDF()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-3.5 py-2 rounded-xl text-xs md:text-sm flex items-center gap-2 shadow-sm transition-all" title="Scarica un PDF con tutte le schede aperte">
+                    <i class="fa-solid fa-file-pdf"></i> Scarica PDF Completo
+                </button>
+
+                <button onclick="window.print()" class="bg-white/15 hover:bg-white/25 text-white font-semibold px-3.5 py-2 rounded-xl text-xs md:text-sm flex items-center gap-2 border border-white/20 transition-all" title="Stampa o Salva in PDF tutte le sezioni aperte">
+                    <i class="fa-solid fa-print"></i> Stampa Tutto
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div id="appWrapper" class="flex-1 flex flex-col md:flex-row overflow-hidden max-w-7xl mx-auto w-full">
+        
+        <!-- Sidebar Navigation -->
+        <nav class="md:w-72 bg-white border-b md:border-b-0 md:border-r border-slate-200 p-4 overflow-x-auto md:overflow-y-auto shrink-0 flex md:flex-col gap-2 no-print">
+            <div class="hidden md:block text-xs font-bold uppercase tracking-wider text-slate-400 px-3 mb-1">Fasi dell'Incontro</div>
+            
+            <button onclick="switchTab('tab1', this)" class="tab-btn active text-left px-4 py-3.5 rounded-xl w-full transition-all bg-indigo-50 text-indigo-700 font-semibold border border-indigo-200 flex items-center gap-3 shrink-0 md:shrink">
+                <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-mug-hot"></i>
+                </span>
+                <div>
+                    <div class="text-sm leading-tight">1. Accoglienza</div>
+                    <div class="text-xs text-slate-500 font-normal hidden md:block">Check-in emotivo post-diagnosi</div>
+                </div>
+            </button>
+
+            <button onclick="switchTab('tab2', this)" class="tab-btn text-left px-4 py-3.5 rounded-xl w-full transition-all text-slate-600 hover:bg-slate-50 border border-transparent flex items-center gap-3 shrink-0 md:shrink">
+                <span class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-lightbulb"></i>
+                </span>
+                <div>
+                    <div class="text-sm leading-tight">2. Cos'è l'ADHD?</div>
+                    <div class="text-xs text-slate-500 font-normal hidden md:block">Scheda 1 • Funzionamento e Ferrari</div>
+                </div>
+            </button>
+
+            <button onclick="switchTab('tab3', this)" class="tab-btn text-left px-4 py-3.5 rounded-xl w-full transition-all text-slate-600 hover:bg-slate-50 border border-transparent flex items-center gap-3 shrink-0 md:shrink">
+                <span class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-masks-theater"></i>
+                </span>
+                <div>
+                    <div class="text-sm leading-tight">3. Miti vs Realtà</div>
+                    <div class="text-xs text-slate-500 font-normal hidden md:block">Scheda 2 • I 7 Miti da sfatare</div>
+                </div>
+            </button>
+
+            <button onclick="switchTab('tab4', this)" class="tab-btn text-left px-4 py-3.5 rounded-xl w-full transition-all text-slate-600 hover:bg-slate-50 border border-transparent flex items-center gap-3 shrink-0 md:shrink">
+                <span class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-list-check"></i>
+                </span>
+                <div>
+                    <div class="text-sm leading-tight">4. Sintesi e Quiz</div>
+                    <div class="text-xs text-slate-500 font-normal hidden md:block">Fissiamo i concetti chiave</div>
+                </div>
+            </button>
+
+            <!-- Box guida interattiva nel menu laterale -->
+            <div class="hidden md:block mt-auto pt-4 border-t border-slate-100 space-y-3">
+                <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200/80 text-xs text-slate-600 space-y-1.5">
+                    <div class="font-semibold text-slate-800 flex items-center gap-1.5">
+                        <i class="fa-solid fa-hand-pointer text-indigo-600"></i> Lettura Interattiva
+                    </div>
+                    <p class="leading-relaxed">
+                        Durante la lettura delle <strong>Schede 1 e 2</strong>, clicca sui pulsanti <span class="text-indigo-600 font-medium">"Mi ci rivedo"</span> accanto alle frasi che senti appartenere alla tua storia.
+                    </p>
+                </div>
+                <div class="bg-indigo-50/70 rounded-xl p-3.5 border border-indigo-200/80 text-xs text-slate-600 space-y-1.5">
+                    <div class="font-semibold text-indigo-950 flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-pdf text-indigo-600"></i> Esportazione PDF Statica
+                    </div>
+                    <p class="leading-relaxed">
+                        Cliccando su <strong>"Scarica PDF Completo"</strong> o <strong>"Stampa Tutto"</strong> in alto, tutte le schede e i 3 pilastri si apriranno in un unico documento completo.
+                    </p>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content Area -->
+        <main id="mainScrollArea" class="flex-1 p-4 md:p-8 overflow-y-auto relative space-y-6">
+            
+            <!-- Intestazione visibile SOLO nella versione stampata / PDF -->
+            <div class="print-only-header hidden border-b-2 border-indigo-700 pb-4 mb-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-widest text-indigo-700">Programma Integrato di Psicoeducazione AuDHD</div>
+                        <h1 class="text-2xl font-extrabold text-slate-900 mt-1">Incontro 1: Comprendere l'ADHD nell'Adulto, De-stigmatizzazione e Rilettura della Storia</h1>
+                        <p class="text-xs text-slate-500 mt-1">Dispensa clinica completa (Schede 1 e 2 Migliarese et al.) con tutte le sezioni aperte e gli spunti selezionati in seduta.</p>
+                    </div>
+                    <div class="text-xs text-slate-500 text-right">
+                        <div id="printDateLabel"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 TAB 1: ACCOGLIENZA E CHECK-IN EMOTIVO
+                 ========================================== -->
+            <div id="tab1" class="tab-content active max-w-4xl mx-auto space-y-6">
+                
+                <!-- Hero Card -->
+                <div class="glass-panel rounded-2xl p-6 md:p-8 border-t-4 border-t-indigo-600">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold mb-4">
+                        <i class="fa-solid fa-compass"></i> Fase 1 • Orientamento e Validazione
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-3">Un manuale d'istruzioni per la tua mente</h2>
+                    <p class="text-base md:text-lg text-slate-600 leading-relaxed mb-6">
+                        L'obiettivo di questo percorso non è "cambiarti", "correggerti" o "ripararti". 
+                        Ricevere una diagnosi in età adulta significa passare da un giudizio morale su di sé (<em>"sono pigra, sbagliata, incoerente"</em>) a una <strong>comprensione neurobiologica ed ecologica</strong> del proprio funzionamento.
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/70">
+                            <div class="text-indigo-600 font-bold text-sm mb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-magnifying-glass"></i> 1. Comprendere
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">Capire come lavorano davvero la tua attenzione, il tuo sistema nervoso e la tua memoria di lavoro.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/70">
+                            <div class="text-emerald-600 font-bold text-sm mb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-feather-pointed"></i> 2. De-colpevolizzare
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">Rileggere gli episodi del passato scolastico e quotidiano togliendo il peso della vergogna.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/70">
+                            <div class="text-amber-600 font-bold text-sm mb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-sliders"></i> 3. Adattare
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">Smettere di sprecare energie imitando metodi non adatti a te e costruire strategie su misura.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Check-in Emotivo Post-Diagnosi -->
+                <div class="glass-panel rounded-2xl p-6 md:p-8">
+                    <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-heart-pulse text-rose-500"></i> Come sono andati i giorni dopo la restituzione?
+                    </h3>
+                    <p class="text-slate-600 text-sm md:text-base mb-6">
+                        Dopo una diagnosi in età adulta è del tutto fisiologico sperimentare un'onda emotiva complessa, in cui convivono stati d'animo anche opposti. Seleziona quelli che hai avvertito in questi giorni:
+                    </p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                        <button onclick="toggleEmotion(this)" class="emotion-btn text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-emerald-400 transition-all flex items-start gap-3">
+                            <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-wind"></i></span>
+                            <div>
+                                <div class="font-semibold text-slate-800 text-sm">Sollievo e Validazione</div>
+                                <div class="text-xs text-slate-500 mt-0.5">"Finalmente c'è un nome. Non me lo stavo inventando."</div>
+                            </div>
+                        </button>
+
+                        <button onclick="toggleEmotion(this)" class="emotion-btn text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-rose-400 transition-all flex items-start gap-3">
+                            <span class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-fire-flame-curved"></i></span>
+                            <div>
+                                <div class="font-semibold text-slate-800 text-sm">Rabbia o Frustrazione</div>
+                                <div class="text-xs text-slate-500 mt-0.5">"Perché nessuno se n'è accorto prima? Quanta fatica avrei risparmiato?"</div>
+                            </div>
+                        </button>
+
+                        <button onclick="toggleEmotion(this)" class="emotion-btn text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-amber-400 transition-all flex items-start gap-3">
+                            <span class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-cloud-rain"></i></span>
+                            <div>
+                                <div class="font-semibold text-slate-800 text-sm">Vissuto di Lutto / Tenerezza</div>
+                                <div class="text-xs text-slate-500 mt-0.5">Dispiacere per la "me stessa bambina/adolescente" che si sentiva sbagliata.</div>
+                            </div>
+                        </button>
+
+                        <button onclick="toggleEmotion(this)" class="emotion-btn text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-blue-400 transition-all flex items-start gap-3">
+                            <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-circle-question"></i></span>
+                            <div>
+                                <div class="font-semibold text-slate-800 text-sm">Smarrimento / Sindrome dell'Impostore</div>
+                                <div class="text-xs text-slate-500 mt-0.5">"E adesso cosa cambia? Dove finisce il disturbo e dove inizio io?"</div>
+                            </div>
+                        </button>
+
+                        <button onclick="toggleEmotion(this)" class="emotion-btn text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-purple-400 transition-all flex items-start gap-3">
+                            <span class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                            <div>
+                                <div class="font-semibold text-slate-800 text-sm">Curiosità e "Effetto Eurèka"</div>
+                                <div class="text-xs text-slate-500 mt-0.5">Notare continuamente episodi quotidiani che ora hanno finalmente un senso.</div>
+                            </div>
+                        </button>
+
+                        <button onclick="toggleEmotion(this)" class="emotion-btn text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-400 transition-all flex items-start gap-3">
+                            <span class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-battery-quarter"></i></span>
+                            <div>
+                                <div class="font-semibold text-slate-800 text-sm">Stanchezza da Elaborazione</div>
+                                <div class="text-xs text-slate-500 mt-0.5">Sensazione di mente piena per tutte le informazioni che stanno sedimentando.</div>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="flex justify-end no-print">
+                        <button onclick="switchTab('tab2', document.querySelectorAll('.tab-btn')[1])" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl shadow-sm transition-all flex items-center gap-2 text-sm">
+                            Passa alla Scheda 1: Cos'è l'ADHD <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ==========================================
+                 TAB 2: SCHEDA 1 - COS'È L'ADHD (APPROFONDITA)
+                 ========================================== -->
+            <div id="tab2" class="tab-content max-w-4xl mx-auto space-y-8 pb-8">
+                
+                <!-- Intestazione Scheda 1 -->
+                <div class="glass-panel rounded-2xl p-6 md:p-8 border-l-4 border-l-indigo-600">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <span class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs font-bold uppercase tracking-wide">
+                            Scheda 1 • Caratteristiche del Disturbo
+                        </span>
+                        <span class="text-xs text-slate-400">Rif. Clinico: Migliarese et al.</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-4">Conoscere l'ADHD nell'Adulto: Una Modalità di Funzionamento</h2>
+                    <p class="text-slate-600 leading-relaxed mb-4">
+                        L'<strong>ADHD</strong> (<em>Attention Deficit Hyperactivity Disorder</em>) è una condizione neurobiologica a esordio precoce con un'<strong>alta componente genetica (circa il 70%)</strong> e a espressione variabile nel corso della vita.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div class="bg-indigo-50/70 p-4 rounded-xl border border-indigo-100">
+                            <h4 class="font-bold text-indigo-950 text-sm mb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-fingerprint text-indigo-600"></i> Identità e Percezione di Sé
+                            </h4>
+                            <p class="text-xs md:text-sm text-slate-700 leading-relaxed">
+                                A differenza di altri quadri che insorgono in un momento specifico, l'ADHD accompagna la persona fin dall'infanzia: per questo viene spesso scambiato per un <strong>"tratto del carattere"</strong> (<em>"sono fatta così, sono disordinata, sono incostante"</em>). In realtà è una <strong>modalità di funzionamento neurobiologico</strong> che influenza l'apprendimento, la gestione delle emozioni e le relazioni.
+                            </p>
+                        </div>
+                        <div class="bg-amber-50/70 p-4 rounded-xl border border-amber-100">
+                            <h4 class="font-bold text-amber-950 text-sm mb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-eye-slash text-amber-600"></i> Il Passaggio "Sotto Silenzio"
+                            </h4>
+                            <p class="text-xs md:text-sm text-slate-700 leading-relaxed">
+                                Quando prevale la componente disattentiva o l'iperattività è tutta interna/mentale, il disturbo non disturba gli altri: passa facilmente <strong>"sotto silenzio"</strong> durante la scuola, ma comporta un enorme dispendio energetico invisibile che nel tempo può generare ansia o flessioni dell'umore secondarie.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- IL CONCETTO CHIAVE: NON DEFICIT MA REGOLAZIONE -->
+                <div class="glass-panel rounded-2xl p-6 md:p-8">
+                    <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-indigo-600"></i> Il Paradosso dell'Attenzione: Perché a volte mi iperfocalizzo?
+                    </h3>
+                    <p class="text-slate-600 text-sm md:text-base mb-6 leading-relaxed">
+                        Il termine "Deficit di Attenzione" è fuorviante: chi ha l'ADHD non ha una "mancanza assoluta" di attenzione, ma una <strong>difficoltà nel regolarla e distribuirla a comando</strong>. L'attenzione non è un parametro fisso, ma dipende dalla chimica cerebrale (dopamina e noradrenalina), dallo stress fisico/mentale e dall'insonnia.
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Sistema basato sull'Importanza -->
+                        <div class="p-5 rounded-xl bg-slate-50 border border-slate-200">
+                            <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Sistema Neurotipico</div>
+                            <h4 class="font-bold text-slate-800 text-base mb-2">Guidato dall'Importanza e dal "Dovere"</h4>
+                            <p class="text-sm text-slate-600 leading-relaxed mb-3">
+                                Il cervello attiva le risorse attentive semplicemente perché riconosce che un compito <em>"va fatto"</em>, è prioritario o ha una ricompensa lontana nel tempo.
+                            </p>
+                            <div class="flex flex-wrap gap-2 text-xs">
+                                <span class="px-2.5 py-1 bg-slate-200 text-slate-700 rounded-md font-medium">Forza di volontà lineare</span>
+                                <span class="px-2.5 py-1 bg-slate-200 text-slate-700 rounded-md font-medium">Pianificazione gerarchica</span>
+                            </div>
+                        </div>
+
+                        <!-- Sistema ADHD -->
+                        <div class="p-5 rounded-xl bg-indigo-50/60 border border-indigo-200">
+                            <div class="text-xs font-bold uppercase tracking-wider text-indigo-600 mb-2">Sistema Nervoso ADHD</div>
+                            <h4 class="font-bold text-indigo-950 text-base mb-2">Guidato dall'Interesse e dall'Attivazione</h4>
+                            <p class="text-sm text-slate-700 leading-relaxed mb-3">
+                                Il cervello si "accende" quando lo stimolo fornisce dopamina immediata. Se un compito è ripetitivo, astratto o privo di scadenza imminente, il cervello fatica fisicamente a ingranare la marcia.
+                            </p>
+                            <div class="flex flex-wrap gap-2 text-xs">
+                                <span class="px-2.5 py-1 bg-indigo-100 text-indigo-800 rounded-md font-semibold"><i class="fa-solid fa-star mr-1"></i>Interesse / Passione</span>
+                                <span class="px-2.5 py-1 bg-indigo-100 text-indigo-800 rounded-md font-semibold"><i class="fa-solid fa-sparkles mr-1"></i>Novità / Curiosità</span>
+                                <span class="px-2.5 py-1 bg-indigo-100 text-indigo-800 rounded-md font-semibold"><i class="fa-solid fa-stopwatch mr-1"></i>Urgenza / Pressione</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ESPLORAZIONE INTERATTIVA DELLA TRIADE SINTOMATOLOGICA (Scheda 1) -->
+                <div class="glass-panel rounded-2xl p-6 md:p-8">
+                    <div class="mb-6">
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-800 mb-2">I 3 Pilastri nell'Età Adulta (Scheda 1)</h3>
+                        <p class="text-sm text-slate-600">
+                            Esploriamo insieme come si manifestano <strong>Attenzione, Iperattività e Impulsività</strong> nella vita quotidiana di un adulto. Clicca su <span class="text-indigo-600 font-semibold">"Mi ci rivedo"</span> sugli aspetti che ti appartengono:
+                        </p>
+                    </div>
+
+                    <!-- Sotto-schede dei 3 pilastri (Nascoste in stampa perché i 3 pannelli vengono aperti tutti) -->
+                    <div class="flex flex-wrap gap-2 mb-6 border-b border-slate-200 pb-3 no-print">
+                        <button onclick="switchPillar('pillar-attenzione', this)" class="pillar-btn bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-arrows-to-eye"></i> 1. Attenzione (3 Tipi)
+                        </button>
+                        <button onclick="switchPillar('pillar-iperattivita', this)" class="pillar-btn bg-slate-100 text-slate-700 hover:bg-slate-200 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-bolt"></i> 2. Iperattività Interna
+                        </button>
+                        <button onclick="switchPillar('pillar-impulsivita', this)" class="pillar-btn bg-slate-100 text-slate-700 hover:bg-slate-200 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-gauge-high"></i> 3. Impulsività e Scelte
+                        </button>
+                    </div>
+
+                    <!-- PILASTRO 1: ATTENZIONE -->
+                    <div id="pillar-attenzione" class="pillar-panel space-y-5">
+                        <div class="text-xs font-bold uppercase tracking-wider text-indigo-600">Pilastro 1 • Disattenzione e Regolazione Attentiva</div>
+                        <p class="text-sm md:text-base text-slate-700 leading-relaxed">
+                            Nell'adulto la disattenzione si manifesta come distraibilità, senso di confusione davanti a troppi input, dimenticanze, difficoltà a stabilire le giuste priorità e <strong>Time Blindness</strong> (alterazione nella percezione dello scorrere del tempo e conseguenti ritardi o errata stima dei tempi di un compito).
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="p-4 rounded-xl bg-indigo-50/50 border border-indigo-100 flex flex-col justify-between">
+                                <div>
+                                    <div class="font-bold text-indigo-900 mb-1 flex items-center gap-2">
+                                        <i class="fa-solid fa-hourglass-half text-indigo-600"></i> Attenzione Sostenuta
+                                    </div>
+                                    <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                        Capacità di mantenere il focus su uno stimolo per un tempo prolungato. Se il compito è monotono, la batteria mentale cala rapidamente e leggere una pagina richiede il triplo dello sforzo.
+                                    </p>
+                                </div>
+                                <button onclick="toggleResonance(this, 'Fatica nell\'attenzione sostenuta su compiti lunghi o monotoni')" class="resonance-chip w-full py-2 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-600 hover:border-indigo-400 transition-all flex items-center justify-center gap-1.5">
+                                    <i class="fa-regular fa-bookmark"></i> Mi ci rivedo
+                                </button>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-indigo-50/50 border border-indigo-100 flex flex-col justify-between">
+                                <div>
+                                    <div class="font-bold text-indigo-900 mb-1 flex items-center gap-2">
+                                        <i class="fa-solid fa-filter text-indigo-600"></i> Attenzione Selettiva
+                                    </div>
+                                    <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                        Capacità di filtrare ciò che è rilevante ignorando il resto. Nell'ADHD il "filtro" è poroso: sia i rumori ambientali sia i <strong>pensieri associativi interni</strong> catturano l'attenzione.
+                                    </p>
+                                </div>
+                                <button onclick="toggleResonance(this, 'Distraibilità da stimoli esterni o da una catena di pensieri interni')" class="resonance-chip w-full py-2 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-600 hover:border-indigo-400 transition-all flex items-center justify-center gap-1.5">
+                                    <i class="fa-regular fa-bookmark"></i> Mi ci rivedo
+                                </button>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-indigo-50/50 border border-indigo-100 flex flex-col justify-between">
+                                <div>
+                                    <div class="font-bold text-indigo-900 mb-1 flex items-center gap-2">
+                                        <i class="fa-solid fa-shuffle text-indigo-600"></i> Attenzione Divisa e Shifting
+                                    </div>
+                                    <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                        Gestire più informazioni insieme o passare da un compito all'altro (<em>rigidità cognitiva</em>). Include l'<strong>iperfocalizzazione</strong>: assorbirsi così tanto da perdere cognizione del tempo e dei bisogni fisici.
+                                    </p>
+                                </div>
+                                <button onclick="toggleResonance(this, 'Fatica a interrompere un\'attività o iperfocalizzazione assorbente')" class="resonance-chip w-full py-2 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-600 hover:border-indigo-400 transition-all flex items-center justify-center gap-1.5">
+                                    <i class="fa-regular fa-bookmark"></i> Mi ci rivedo
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Citazioni dalla Scheda 1 -->
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                            <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Esempi diretti dalla Scheda 1</div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs md:text-sm italic text-slate-700">
+                                <div class="bg-white p-3 rounded-lg border border-slate-200/80">
+                                    «Mentre devo fare una cosa me ne viene in mente un'altra, apro dieci parentesi mentali o vengo distratta da uno stimolo.»
+                                </div>
+                                <div class="bg-white p-3 rounded-lg border border-slate-200/80">
+                                    «Se mentre faccio una cosa devo interrompermi faccio molta fatica; oppure sono così assorbita dal mio hobby che non mi accorgo di ciò che accade attorno.»
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PILASTRO 2: IPERATTIVITÀ NELL'ADULTO -->
+                    <div id="pillar-iperattivita" class="pillar-panel hidden space-y-5">
+                        <div class="text-xs font-bold uppercase tracking-wider text-rose-600">Pilastro 2 • Iperattività nell'Adulto (Interna e Mentale)</div>
+                        <p class="text-sm md:text-base text-slate-700 leading-relaxed">
+                            Nel corso dello sviluppo l'iperattività motoria infantile cambia volto: nell'adulto non è più "correre sui banchi", ma diventa <strong>irrequietezza interna, tensione muscolare costante, logorrea e iperattività ideativa/mentale</strong> (un flusso di pensieri che non si spegne mai, neppure quando si chiudono gli occhi per dormire).
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 rounded-xl bg-rose-50/50 border border-rose-100 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="font-bold text-rose-900 text-sm mb-2 flex items-center gap-2">
+                                        <i class="fa-solid fa-Hurricane text-rose-600"></i> Iperattività Mentale e "Brain Spinning"
+                                    </h4>
+                                    <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                        Sensazione di avere un motore sempre acceso nella testa: pensieri sovrapposti, pianificazioni infinite prima di iniziare una task, difficoltà a rilassarsi sul divano senza sentirsi in colpa o irrequieti, fatica ad addormentarsi per il vortice mentale.
+                                    </p>
+                                </div>
+                                <button onclick="toggleResonance(this, 'Iperattività mentale, vortice di pensieri (spinning) e difficoltà a spegnere la mente')" class="resonance-chip w-full py-2 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-600 hover:border-indigo-400 transition-all flex items-center justify-center gap-1.5">
+                                    <i class="fa-regular fa-bookmark"></i> Mi ci rivedo
+                                </button>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-rose-50/50 border border-rose-100 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="font-bold text-rose-900 text-sm mb-2 flex items-center gap-2">
+                                        <i class="fa-solid fa-hands-bubbles text-rose-600"></i> Scarica Motoria Micro e Situazioni di Attesa
+                                    </h4>
+                                    <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                        Fatica nelle situazioni statiche (riunioni lunghe, file, conferenze, teatro). Il corpo cerca vie di scarica energetica ed emotiva: mangiarsi le unghie/pellicine, toccarsi i capelli, muovere la gamba, giochicchiare con penne (<em>fidgeting/stimming</em>) o ricorrere allo sport intenso per "stancare la mente".
+                                    </p>
+                                </div>
+                                <button onclick="toggleResonance(this, 'Tensione interna nelle attese e bisogno di micro-movimenti (fidgeting/stimming)')" class="resonance-chip w-full py-2 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-600 hover:border-indigo-400 transition-all flex items-center justify-center gap-1.5">
+                                    <i class="fa-regular fa-bookmark"></i> Mi ci rivedo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PILASTRO 3: IMPULSIVITÀ -->
+                    <div id="pillar-impulsivita" class="pillar-panel hidden space-y-5">
+                        <div class="text-xs font-bold uppercase tracking-wider text-amber-600">Pilastro 3 • Impulsività e Controllo Inibitorio</div>
+                        <p class="text-sm md:text-base text-slate-700 leading-relaxed">
+                            La Scheda 1 definisce l'impulsività come un comportamento compiuto sotto la spinta di un'impellente pulsione, con una fatica del "freno inibitorio" prefrontale. Anche nelle persone molto riflessive o perfezioniste, l'impulsività può emergere in modi sottili:
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="p-4 rounded-xl bg-amber-50/50 border border-amber-100 flex flex-col justify-between">
+                                <div>
+                                    <div class="font-bold text-amber-900 text-sm mb-1">1. Controllo Inibitorio Verbale/Emotivo</div>
+                                    <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                        Rispondere prima che l'altro abbia finito la domanda (perché si è già intuito dove vuole arrivare), timore di dimenticare ciò che si voleva dire, o ondate emotive immediate e intense.
+                                    </p>
+                                </div>
+                                <button onclick="toggleResonance(this, 'Impazienza conversazionale o risposte immediate per paura di perdere il filo')" class="resonance-chip w-full py-2 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-600 hover:border-indigo-400 transition-all flex items-center justify-center gap-1.5">
+                                    <i class="fa-regular fa-bookmark"></i> Mi ci rivedo
+                                </button>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-amber-50/50 border border-amber-100 flex flex-col justify-between">
+                                <div>
+                                    <div class="font-bold text-amber-900 text-sm mb-1">2. Bilancio Costi / Benefici</div>
+                                    <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                        Entusiasmarsi intensamente per un nuovo progetto, hobby o acquisto sul momento, salvo poi sentirsi sopraffatti quando subentra la fase di mantenimento routinario.
+                                    </p>
+                                </div>
+                                <button onclick="toggleResonance(this, 'Slanci entusiastici per nuovi hobby o progetti difficili poi da mantenere')" class="resonance-chip w-full py-2 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-600 hover:border-indigo-400 transition-all flex items-center justify-center gap-1.5">
+                                    <i class="fa-regular fa-bookmark"></i> Mi ci rivedo
+                                </button>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-amber-50/50 border border-amber-100 flex flex-col justify-between">
+                                <div>
+                                    <div class="font-bold text-amber-900 text-sm mb-1">3. Ricerca di Gratificazione Rapida</div>
+                                    <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                        Fatica a tollerare la noia o l'attesa; ricerca di piccoli stimoli dopaminergici immediati (scrolling sul telefono, snack/cibo consolatorio o cambi improvvisi di attività) per alleviare la tensione.
+                                    </p>
+                                </div>
+                                <button onclick="toggleResonance(this, 'Ricerca di dopamina rapida (telefono, cibo, stimoli) quando cala l\'energia')" class="resonance-chip w-full py-2 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-600 hover:border-indigo-400 transition-all flex items-center justify-center gap-1.5">
+                                    <i class="fa-regular fa-bookmark"></i> Mi ci rivedo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SIMULATORE INTERATTIVO: LA METAFORA DELLA FERRARI (DISCREPANZA COGNITIVA) -->
+                <div class="glass-panel p-6 md:p-8 rounded-2xl bg-gradient-to-br from-slate-800 via-slate-900 to-indigo-950 text-white shadow-xl relative overflow-hidden">
+                    <i class="fa-solid fa-gauge-Simple-high absolute -right-6 -bottom-6 text-9xl text-white opacity-5 pointer-events-none"></i>
+                    
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <span class="px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold uppercase tracking-wider border border-amber-400/30">
+                            <i class="fa-solid fa-car-side mr-1"></i> Profilo Neuropsicologico • La Metafora della Ferrari
+                        </span>
+                    </div>
+
+                    <h3 class="text-2xl font-bold mb-3 text-white">Motore da Formula 1, Cambio e Raffreddamento Delicati</h3>
+                    <p class="mb-6 text-slate-300 text-sm md:text-base leading-relaxed">
+                        Nelle persone ad <strong>alto potenziale cognitivo</strong>, il ragionamento logico e verbale è come il motore di una Ferrari: veloce, profondo, capace di vedere dieci connessioni contemporaneamente. Tuttavia, la <strong>Memoria di Lavoro</strong> (la "scrivania mentale" che tiene a mente i passaggi operativi) ha uno spazio limitato. Quando troppe idee o richieste arrivano tutte insieme, il sistema va in <strong>surriscaldamento (Task Paralysis)</strong>.
+                    </p>
+                    
+                    <!-- Barre statiche di confronto potenziale vs memoria di lavoro -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 bg-slate-800/70 p-5 rounded-xl border border-slate-700">
+                        <div>
+                            <div class="flex justify-between mb-1.5 text-sm">
+                                <span class="font-medium text-slate-200"><i class="fa-solid fa-microchip text-emerald-400 mr-1.5"></i>Il Motore (Ragionamento e Astrazione)</span>
+                                <span class="font-bold text-emerald-400">Molto Elevato</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-3.5">
+                                <div class="bg-gradient-to-r from-emerald-500 to-teal-400 h-3.5 rounded-full" style="width: 92%"></div>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-1.5">Comprendi concetti complessi al volo, analizzi in profondità, hai un ottimo lessico e intuito.</p>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-1.5 text-sm">
+                                <span class="font-medium text-slate-200"><i class="fa-solid fa-memory text-amber-400 mr-1.5"></i>La Scrivania Operativa (Memoria di Lavoro)</span>
+                                <span class="font-bold text-amber-400">Collo di Bottiglia</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-3.5">
+                                <div class="bg-gradient-to-r from-amber-500 to-orange-400 h-3.5 rounded-full" style="width: 48%"></div>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-1.5">Tenere a mente le sequenze pratiche, scegliere da dove iniziare e filtrare le priorità sotto pressione costa molta fatica.</p>
+                        </div>
+                    </div>
+
+                    <!-- Simulatore Interattivo di Sovraccarico della Memoria di Lavoro -->
+                    <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-700/80">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+                            <h4 class="font-bold text-amber-300 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-sliders"></i> Simulatore: Cosa succede nella "Paralisi del Compito"?
+                            </h4>
+                            <span id="ferrariStatusBadge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                Scrivania Mentale: Fluida (30%)
+                            </span>
+                        </div>
+
+                        <div class="w-full bg-slate-800 rounded-full h-4 mb-4 overflow-hidden p-0.5 border border-slate-700">
+                            <div id="ferrariLoadBar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 30%"></div>
+                        </div>
+
+                        <p id="ferrariExplanation" class="text-xs md:text-sm text-slate-300 mb-4 min-h-[2.5rem]">
+                            Con pochi stimoli alla volta e passaggi chiari, il tuo motore lavora al massimo senza incepparsi. Prova ad aggiungere i carichi tipici della giornata:
+                        </p>
+
+                        <div class="flex flex-wrap gap-2 no-print">
+                            <button onclick="updateFerrariLoad(25, 'Hai aggiunto un compito ampio non suddiviso: il motore vede 20 cose da fare tutte insieme!')" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-medium text-slate-200 transition-all">
+                                <i class="fa-solid fa-plus text-amber-400 mr-1"></i> + Compito grande e vago
+                            </button>
+                            <button onclick="updateFerrariLoad(25, 'Subentra il perfezionismo: «Devo farlo subito benissimo o non ha senso iniziare».')" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-medium text-slate-200 transition-all">
+                                <i class="fa-solid fa-plus text-amber-400 mr-1"></i> + Perfezionismo / Aspettative
+                            </button>
+                            <button onclick="updateFerrariLoad(20, 'Rumori, notifiche o imprevisti: la memoria di lavoro perde il filo di dove eri rimasta.')" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-medium text-slate-200 transition-all">
+                                <i class="fa-solid fa-plus text-amber-400 mr-1"></i> + Interruzioni / Rumore
+                            </button>
+                            <button onclick="resetFerrariLoad()" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition-all ml-auto">
+                                <i class="fa-solid fa-snowflake mr-1"></i> Scarica su carta e dividi in micro-step
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-2 no-print">
+                    <button onclick="switchTab('tab1', document.querySelectorAll('.tab-btn')[0])" class="text-slate-600 hover:text-slate-900 font-medium px-4 py-2 rounded-xl text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Torna al Check-in
+                    </button>
+                    <button onclick="switchTab('tab3', document.querySelectorAll('.tab-btn')[2])" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl shadow-sm transition-all flex items-center gap-2 text-sm">
+                        Passa alla Scheda 2: Miti vs Realtà <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- ==========================================
+                 TAB 3: SCHEDA 2 - MITI VS REALTÀ (TUTTI I 7 MITI)
+                 ========================================== -->
+            <div id="tab3" class="tab-content max-w-4xl mx-auto space-y-6 pb-8">
+                
+                <!-- Introduzione Scheda 2 -->
+                <div class="glass-panel rounded-2xl p-6 md:p-8 border-l-4 border-l-emerald-600">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wide">
+                            Scheda 2 • De-stigmatizzazione e Rilettura
+                        </span>
+                        <span class="text-xs text-slate-400">Rif. Clinico: Migliarese et al.</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-3">Miti e Realtà sull'ADHD nell'Adulto</h2>
+                    <p class="text-slate-600 text-sm md:text-base leading-relaxed mb-4">
+                        L'ADHD è una <strong>chiave di lettura</strong>: una lente attraverso cui reinterpretare con giustizia le fatiche vissute nel passato e quelle attuali. Allo stesso tempo, la Scheda 2 ci ricorda un principio clinico fondamentale: <strong>discriminare tra cosa è ADHD e cosa non lo è</strong>.
+                    </p>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs md:text-sm text-slate-700 leading-relaxed">
+                        <i class="fa-solid fa-layer-group text-emerald-600 mr-1.5"></i>
+                        <strong>Effetto Primario vs Secondario:</strong> Nell'adulto l'ADHD si presenta spesso insieme ad ansia, tensione o calo dell'umore. Spesso queste condizioni nascono come <em>conseguenza dell'aver compensato al buio per anni</em>. Conoscere il proprio funzionamento permette di smontare i <strong>7 Falsi Miti</strong> più diffusi.
+                    </div>
+                </div>
+
+                <!-- I 7 MITI INTEGRALI E INTERATTIVI -->
+                <div class="space-y-4">
+                    
+                    <!-- MITO 1 -->
+                    <div class="glass-panel p-6 rounded-2xl myth-card border-l-4 border-l-rose-400">
+                        <div class="flex flex-col md:flex-row gap-5">
+                            <div class="md:w-5/12 bg-rose-50/80 p-4 rounded-xl border border-rose-100 flex flex-col justify-between">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-700 mb-2">
+                                        <i class="fa-solid fa-circle-xmark"></i> Mito 1 • Esordio e Diagnosi
+                                    </span>
+                                    <h4 class="font-bold text-rose-950 text-base leading-snug">
+                                        «Se non c'è stata una diagnosi da bambini, non può essere ADHD da adulti.»
+                                    </h4>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-rose-200/60 text-xs text-rose-800 italic">
+                                    Il dubbio interno: "Ma alle elementari e al liceo andavo bene, come è possibile?"
+                                </div>
+                            </div>
+                            <div class="md:w-7/12 flex flex-col justify-between">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
+                                        <i class="fa-solid fa-circle-check"></i> La Realtà Clinica
+                                    </span>
+                                    <p class="text-slate-700 text-sm leading-relaxed mb-3">
+                                        L'ADHD è presente fin dall'infanzia, ma può rendersi <strong>clinicamente evidente solo in età adulta</strong>. Questo accade tipicamente nelle persone con <strong>elevate risorse intellettive</strong> o inserite in un contesto familiare/scolastico strutturato che fungeva da "impalcatura invisibile".
+                                    </p>
+                                    <p class="text-slate-600 text-xs leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200/70">
+                                        <strong>Cosa succede crescendo?</strong> Quando all'università o nella vita adulta crolla la struttura esterna e bisogna autogestire tempo, esami, casa e priorità, il carico supera la soglia di compensazione e le fatiche emergono tutte insieme.
+                                    </p>
+                                </div>
+                                <div class="mt-3 flex justify-end">
+                                    <button onclick="toggleResonance(this, 'Mito 1: Compensazione scolastica grazie all\'alto QI ed esplosione delle fatiche con le richieste dell\'età adulta')" class="resonance-chip py-1.5 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-600 hover:border-indigo-400 transition-all flex items-center gap-1.5">
+                                        <i class="fa-regular fa-bookmark"></i> Questo mito mi ha fatto dubitare di me
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MITO 2 -->
+                    <div class="glass-panel p-6 rounded-2xl myth-card border-l-4 border-l-rose-400">
+                        <div class="flex flex-col md:flex-row gap-5">
+                            <div class="md:w-5/12 bg-rose-50/80 p-4 rounded-xl border border-rose-100 flex flex-col justify-between">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-700 mb-2">
+                                        <i class="fa-solid fa-circle-xmark"></i> Mito 2 • Evoluzione nel Tempo
+                                    </span>
+                                    <h4 class="font-bold text-rose-950 text-base leading-snug">
+                                        «L'ADHD è un disturbo dei bambini e passa crescendo con l'età.»
+                                    </h4>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-rose-200/60 text-xs text-rose-800 italic">
+                                    L'aspettativa sociale: "Ormai sei grande, dovresti aver imparato a organizzarti."
+                                </div>
+                            </div>
+                            <div class="md:w-7/12 flex flex-col justify-between">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
+                                        <i class="fa-solid fa-circle-check"></i> La Realtà Clinica
+                                    </span>
+                                    <p class="text-slate-700 text-sm leading-relaxed mb-3">
+                                        Gli studi scientifici mostrano che nella maggioranza dei casi il funzionamento ADHD <strong>permane in età adulta</strong>. Non "sparisce", ma <strong>si trasforma</strong>: l'iperattività esterna si riduce lasciando spazio all'irrequietezza mentale e alla fatica esecutiva, che rimangono fonte di intensa sofferenza soggettiva.
+                                    </p>
+                                </div>
+                                <div class="mt-3 flex justify-end">
+                                    <button onclick="toggleResonance(this, 'Mito 2: Senso di colpa per non essere \"maturata\" nell\'organizzazione nonostante l\'età adulta')" class="resonance-chip py-1.5 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-600 hover:border-indigo-400 transition-all flex items-center gap-1.5">
+                                        <i class="fa-regular fa-bookmark"></i> Mi ci rivedo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MITO 3 -->
+                    <div class="glass-panel p-6 rounded-2xl myth-card border-l-4 border-l-rose-400">
+                        <div class="flex flex-col md:flex-row gap-5">
+                            <div class="md:w-5/12 bg-rose-50/80 p-4 rounded-xl border border-rose-100 flex flex-col justify-between">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-700 mb-2">
+                                        <i class="fa-solid fa-circle-xmark"></i> Mito 3 • Lo Stereotipo Motorio
+                                    </span>
+                                    <h4 class="font-bold text-rose-950 text-base leading-snug">
+                                        «Il sintomo principale dell'ADHD è sempre l'iperattività fisica.»
+                                    </h4>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-rose-200/60 text-xs text-rose-800 italic">
+                                    "Io sono sempre stata tranquilla, educata e seduta al mio posto."
+                                </div>
+                            </div>
+                            <div class="md:w-7/12 flex flex-col justify-between">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
+                                        <i class="fa-solid fa-circle-check"></i> La Realtà Clinica
+                                    </span>
+                                    <p class="text-slate-700 text-sm leading-relaxed mb-3">
+                                        L'ADHD comprende tre manifestazioni: <strong>Disattentiva, Iperattiva/Impulsiva e Combinata</strong>. Si può avere l'ADHD senza mai essersi alzati dal banco a scuola: l'iperattività può essere interamente canalizzata nel flusso incessante dei pensieri, nel perfezionismo e nella tensione interna.
+                                    </p>
+                                </div>
+                                <div class="mt-3 flex justify-end">
+                                    <button onclick="toggleResonance(this, 'Mito 3: Essere sempre apparsa calma ed educata all\'esterno ma con una tempesta di pensieri dentro')" class="resonance-chip py-1.5 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-600 hover:border-indigo-400 transition-all flex items-center gap-1.5">
+                                        <i class="fa-regular fa-bookmark"></i> Mi ci rivedo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MITO 4 -->
+                    <div class="glass-panel p-6 rounded-2xl myth-card border-l-4 border-l-rose-400">
+                        <div class="flex flex-col md:flex-row gap-5">
+                            <div class="md:w-5/12 bg-rose-50/80 p-4 rounded-xl border border-rose-100 flex flex-col justify-between">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-700 mb-2">
+                                        <i class="fa-solid fa-circle-xmark"></i> Mito 4 • Genere e Masking
+                                    </span>
+                                    <h4 class="font-bold text-rose-950 text-base leading-snug">
+                                        «L'ADHD è un problema maschile. Poche donne hanno l'ADHD.»
+                                    </h4>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-rose-200/60 text-xs text-rose-800 italic">
+                                    Il bias storico: modelli diagnostici tarati per decenni solo sui bambini maschi.
+                                </div>
+                            </div>
+                            <div class="md:w-7/12 flex flex-col justify-between">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
+                                        <i class="fa-solid fa-circle-check"></i> La Realtà Clinica (Fenotipo Femminile)
+                                    </span>
+                                    <p class="text-slate-700 text-sm leading-relaxed mb-3">
+                                        Negli adulti l'ADHD si presenta in modo omogeneo tra uomini e donne con un <strong>rapporto di 1:1</strong>. Le bambine e le donne vengono però sistematicamente sotto-diagnosticate perché manifestano più spesso il profilo disattentivo/internalizzante e mettono in atto un intenso <strong>Masking sociale e People Pleasing</strong> (nascondere le proprie fatiche e mettersi in secondo piano per non deludere gli altri).
+                                    </p>
+                                </div>
+                                <div class="mt-3 flex justify-end">
+                                    <button onclick="toggleResonance(this, 'Mito 4: Fenotipo femminile, fatica nascosta tramite Masking e tendenza a mettersi in secondo piano')" class="resonance-chip py-1.5 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-600 hover:border-indigo-400 transition-all flex items-center gap-1.5">
+                                        <i class="fa-regular fa-bookmark"></i> Mi ci rivedo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MITO 5 -->
+                    <div class="glass-panel p-6 rounded-2xl myth-card border-l-4 border-l-rose-400">
+                        <div class="flex flex-col md:flex-row gap-5">
+                            <div class="md:w-5/12 bg-rose-50/80 p-4 rounded-xl border border-rose-100 flex flex-col justify-between">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-700 mb-2">
+                                        <i class="fa-solid fa-circle-xmark"></i> Mito 5 • Volontà e Intelligenza
+                                    </span>
+                                    <h4 class="font-bold text-rose-950 text-base leading-snug">
+                                        «I blocchi nello studio o nel lavoro dipendono da poca forza di volontà o pigrizia.»
+                                    </h4>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-rose-200/60 text-xs text-rose-800 italic">
+                                    La frase più dolorosa: "È intelligente ma non si applica / Se volessi davvero, lo faresti."
+                                </div>
+                            </div>
+                            <div class="md:w-7/12 flex flex-col justify-between">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
+                                        <i class="fa-solid fa-circle-check"></i> La Realtà Clinica
+                                    </span>
+                                    <p class="text-slate-700 text-sm leading-relaxed mb-3">
+                                        <strong>QI e ADHD sono entità totalmente separate.</strong> Ridursi all'ultimo minuto o restare bloccati sul divano per ore mentre dentro si prova un'ansia fortissima per ciò che si dovrebbe fare <em>non è pigrizia</em> (la pigrizia è rilassata e piacevole!), ma <strong>Paralisi Esecutiva (Task Paralysis)</strong>. Un alto QI aiuta a trovare scorciatoie geniali, ma l'ADHD rende faticoso esprimere quel potenziale con continuità.
+                                    </p>
+                                </div>
+                                <div class="mt-3 flex justify-end">
+                                    <button onclick="toggleResonance(this, 'Mito 5: Senso di colpa per la procrastinazione/paralisi del compito scambiata per mancanza di volontà')" class="resonance-chip py-1.5 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-600 hover:border-indigo-400 transition-all flex items-center gap-1.5">
+                                        <i class="fa-regular fa-bookmark"></i> Mi ci rivedo profondamente
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MITO 6 -->
+                    <div class="glass-panel p-6 rounded-2xl myth-card border-l-4 border-l-rose-400">
+                        <div class="flex flex-col md:flex-row gap-5">
+                            <div class="md:w-5/12 bg-rose-50/80 p-4 rounded-xl border border-rose-100 flex flex-col justify-between">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-700 mb-2">
+                                        <i class="fa-solid fa-circle-xmark"></i> Mito 6 • Il Trattamento
+                                    </span>
+                                    <h4 class="font-bold text-rose-950 text-base leading-snug">
+                                        «L'ADHD si cura esclusivamente con i farmaci.»
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="md:w-7/12 flex flex-col justify-between">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
+                                        <i class="fa-solid fa-circle-check"></i> La Realtà Clinica
+                                    </span>
+                                    <p class="text-slate-700 text-sm leading-relaxed">
+                                        La farmacoterapia è un presidio prezioso perché agisce direttamente sulle disfunzioni nucleari (come mettere gli occhiali a un miope), ma prendersi cura dell'ADHD richiede un <strong>intervento multimodale</strong>: psicoeducazione, consapevolezza, adattamento dell'ambiente e "allenamento" di strategie rispettose della propria energia.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MITO 7 -->
+                    <div class="glass-panel p-6 rounded-2xl myth-card border-l-4 border-l-rose-400">
+                        <div class="flex flex-col md:flex-row gap-5">
+                            <div class="md:w-5/12 bg-rose-50/80 p-4 rounded-xl border border-rose-100 flex flex-col justify-between">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-700 mb-2">
+                                        <i class="fa-solid fa-circle-xmark"></i> Mito 7 • Scusa vs Sfida
+                                    </span>
+                                    <h4 class="font-bold text-rose-950 text-base leading-snug">
+                                        «L'ADHD spiega ogni difficoltà (o rischia di diventare una scusa).»
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="md:w-7/12 flex flex-col justify-between">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
+                                        <i class="fa-solid fa-circle-check"></i> La Realtà Clinica
+                                    </span>
+                                    <p class="text-slate-700 text-sm leading-relaxed">
+                                        La diagnosi fornisce una spiegazione coerente alle fatiche di una vita e libera dal senso di colpa, ma non è una condanna passiva a "subire" il disturbo. Come sottolinea la Scheda 2: <strong>«L'ADHD non è una scusa per adagiarsi, ma una sfida per attivarsi e prendersi cura di sé in modo finalmente funzionale.»</strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Box Sintesi Finale Scheda 2 -->
+                <div class="bg-emerald-900 text-white p-6 rounded-2xl shadow-md">
+                    <h4 class="font-bold text-emerald-300 text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-star"></i> In Sintesi (Scheda 2 Migliarese)
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-emerald-50">
+                        <div class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-400 mt-1"></i> <span>Può rendersi manifesto in età adulta e non sparisce con l'età.</span></div>
+                        <div class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-400 mt-1"></i> <span>Si manifesta anche nelle donne (rapporto 1:1 negli adulti).</span></div>
+                        <div class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-400 mt-1"></i> <span>Non ha sempre come sintomo principale l'iperattività fisica.</span></div>
+                        <div class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-400 mt-1"></i> <span>Non è mai un difetto di intelligenza o di forza di volontà.</span></div>
+                        <div class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-400 mt-1"></i> <span>Beneficia di un approccio integrato e multimodale.</span></div>
+                        <div class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-400 mt-1"></i> <span>Non è una scusa né una colpa, ma una bussola operativa.</span></div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-2 no-print">
+                    <button onclick="switchTab('tab2', document.querySelectorAll('.tab-btn')[1])" class="text-slate-600 hover:text-slate-900 font-medium px-4 py-2 rounded-xl text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Torna alla Scheda 1
+                    </button>
+                    <button onclick="switchTab('tab4', document.querySelectorAll('.tab-btn')[3])" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl shadow-sm transition-all flex items-center gap-2 text-sm">
+                        Vai alla Sintesi e Mini-Quiz <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- ==========================================
+                 TAB 4: SINTESI PERSONALIZZATA E MINI-QUIZ
+                 ========================================== -->
+            <div id="tab4" class="tab-content max-w-4xl mx-auto space-y-6 pb-8">
+                
+                <!-- Box Riepilogo Dinamico degli Spunti Risonanti -->
+                <div class="glass-panel p-6 md:p-8 rounded-2xl border-t-4 border-t-amber-500">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-bookmark text-amber-500"></i> Ciò che ha risuonato di più oggi
+                            </h3>
+                            <p class="text-xs md:text-sm text-slate-600 mt-0.5">
+                                Ecco gli elementi delle Schede 1 e 2 in cui ti sei riconosciuta durante la lettura di oggi (utili come spunto per i tuoi <em>"Ah-Ah! Moments"</em> della settimana):
+                            </p>
+                        </div>
+                        <button onclick="exportFullStaticPDF()" class="no-print bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition-all shrink-0">
+                            <i class="fa-solid fa-file-pdf"></i> Esporta Tutta la Scheda in PDF
+                        </button>
+                    </div>
+                    <div id="resonanceSummaryList" class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-sm text-slate-600">
+                        <em>Non hai ancora selezionato spunti con il pulsante "Mi ci rivedo" nelle schede precedenti. Puoi cliccarli in qualsiasi momento durante il colloquio.</em>
+                    </div>
+                </div>
+
+                <!-- Mini-Quiz di Consolidamento -->
+                <div class="glass-panel p-6 md:p-8 rounded-2xl">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-2">Mini-Quiz di Consolidamento</h2>
+                    <p class="text-slate-600 text-sm md:text-base mb-6 pb-4 border-b border-slate-200">
+                        Verifichiamo insieme i concetti chiave dell'Incontro 1 per assicurarci di lasciare fuori dalla porta i vecchi pregiudizi.
+                    </p>
+                    
+                    <form id="quizForm" class="space-y-6">
+                        <!-- Q1 -->
+                        <div class="quiz-question p-4 rounded-xl bg-slate-50/70 border border-slate-200/80" id="q1-container">
+                            <h3 class="text-base md:text-lg font-semibold text-slate-800 mb-3">1. Qual è il rapporto stimato di presenza dell'ADHD tra maschi e femmine in età adulta?</h3>
+                            <div class="space-y-2">
+                                <label class="flex items-start gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-white transition-colors">
+                                    <input type="radio" name="q1" value="A" class="mt-1 w-4 h-4 text-indigo-600">
+                                    <span class="text-sm text-slate-700">A) Molto più frequente nei maschi, nelle donne è rarissimo.</span>
+                                </label>
+                                <label class="flex items-start gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-white transition-colors">
+                                    <input type="radio" name="q1" value="B" class="mt-1 w-4 h-4 text-indigo-600">
+                                    <span class="text-sm text-slate-700">B) Circa 1:1 (paritario, ma nelle donne prevale il sottotipo disattentivo/internalizzato e viene spesso riconosciuto più tardi).</span>
+                                </label>
+                                <label class="flex items-start gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-white transition-colors">
+                                    <input type="radio" name="q1" value="C" class="mt-1 w-4 h-4 text-indigo-600">
+                                    <span class="text-sm text-slate-700">C) Si manifesta solo in chi aveva problemi di condotta a scuola.</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Q2 -->
+                        <div class="quiz-question p-4 rounded-xl bg-slate-50/70 border border-slate-200/80" id="q2-container">
+                            <h3 class="text-base md:text-lg font-semibold text-slate-800 mb-3">2. Come si trasforma tipicamente l'iperattività in un adulto con ADHD?</h3>
+                            <div class="space-y-2">
+                                <label class="flex items-start gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-white transition-colors">
+                                    <input type="radio" name="q2" value="A" class="mt-1 w-4 h-4 text-indigo-600">
+                                    <span class="text-sm text-slate-700">A) Rimane esclusivamente bisogno fisico di correre e saltare.</span>
+                                </label>
+                                <label class="flex items-start gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-white transition-colors">
+                                    <input type="radio" name="q2" value="B" class="mt-1 w-4 h-4 text-indigo-600">
+                                    <span class="text-sm text-slate-700">B) Si manifesta come iperattività mentale ("spinning" di pensieri), tensione interna, logorrea, bisogno di micro-movimenti (fidgeting) e fatica a rilassarsi.</span>
+                                </label>
+                                <label class="flex items-start gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-white transition-colors">
+                                    <input type="radio" name="q2" value="C" class="mt-1 w-4 h-4 text-indigo-600">
+                                    <span class="text-sm text-slate-700">C) Scompare completamente dopo i 18 anni.</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Q3 -->
+                        <div class="quiz-question p-4 rounded-xl bg-slate-50/70 border border-slate-200/80" id="q3-container">
+                            <h3 class="text-base md:text-lg font-semibold text-slate-800 mb-3">3. Quando ti blocchi davanti a un compito importante (Task Paralysis) o ti riduci all'ultimo minuto, da cosa dipende?</h3>
+                            <div class="space-y-2">
+                                <label class="flex items-start gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-white transition-colors">
+                                    <input type="radio" name="q3" value="A" class="mt-1 w-4 h-4 text-indigo-600">
+                                    <span class="text-sm text-slate-700">A) Da scarsa intelligenza o scarso interesse per il proprio futuro.</span>
+                                </label>
+                                <label class="flex items-start gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-white transition-colors">
+                                    <input type="radio" name="q3" value="B" class="mt-1 w-4 h-4 text-indigo-600">
+                                    <span class="text-sm text-slate-700">B) Da pigrizia e mancanza di forza di volontà morale.</span>
+                                </label>
+                                <label class="flex items-start gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-white transition-colors">
+                                    <input type="radio" name="q3" value="C" class="mt-1 w-4 h-4 text-indigo-600">
+                                    <span class="text-sm text-slate-700">C) Da un sovraccarico delle funzioni esecutive e della memoria di lavoro (la "scrivania mentale" piena che fatica a ordinare le priorità senza pressione dopaminergica).</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Q4 -->
+                        <div class="quiz-question p-4 rounded-xl bg-slate-50/70 border border-slate-200/80" id="q4-container">
+                            <h3 class="text-base md:text-lg font-semibold text-slate-800 mb-3">4. Perché una persona con un alto Quoziente Intellettivo può arrivare alla diagnosi solo da adulta?</h3>
+                            <div class="space-y-2">
+                                <label class="flex items-start gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-white transition-colors">
+                                    <input type="radio" name="q4" value="A" class="mt-1 w-4 h-4 text-indigo-600">
+                                    <span class="text-sm text-slate-700">A) Perché l'ADHD le è venuto solo all'università.</span>
+                                </label>
+                                <label class="flex items-start gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-white transition-colors">
+                                    <input type="radio" name="q4" value="B" class="mt-1 w-4 h-4 text-indigo-600">
+                                    <span class="text-sm text-slate-700">B) Perché l'elevato potenziale cognitivo e la struttura scolastica le hanno permesso di compensare e mascherare le difficoltà finché le richieste della vita adulta non hanno superato la soglia di compenso.</span>
+                                </label>
+                                <label class="flex items-start gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-white transition-colors">
+                                    <input type="radio" name="q4" value="C" class="mt-1 w-4 h-4 text-indigo-600">
+                                    <span class="text-sm text-slate-700">C) Perché chi ha un QI alto non ha mai problemi di attenzione.</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 text-center no-print">
+                            <button type="button" onclick="checkQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-xl shadow-md transition-all focus:outline-none focus:ring-4 focus:ring-indigo-200">
+                                Verifica le Risposte <i class="fa-solid fa-check ml-2"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Risultati Quiz -->
+                    <div id="quizResults" class="hidden mt-6 p-6 rounded-xl border transition-all"></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Stato globale per gli spunti in cui la paziente si rivede
+        const selectedResonances = new Set();
+        let currentFerrariLoad = 30;
+
+        window.onload = function() {
+            const dateLabel = document.getElementById('printDateLabel');
+            if (dateLabel) {
+                dateLabel.textContent = 'Data: ' + new Date().toLocaleDateString('it-IT', {
+                    day: '2-digit', month: '2-digit', year: 'numeric'
+                });
+            }
+        };
+
+        // Cambio Tab principale
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-50', 'text-indigo-700', 'font-semibold', 'border-indigo-200');
+                btn.classList.add('text-slate-600', 'border-transparent');
+                const iconBox = btn.querySelector('span');
+                if (iconBox) {
+                    iconBox.classList.remove('bg-indigo-100', 'text-indigo-700');
+                    iconBox.classList.add('bg-slate-100', 'text-slate-600');
+                }
+            });
+            
+            document.getElementById(tabId).classList.add('active');
+            
+            if (btnElement) {
+                btnElement.classList.remove('text-slate-600', 'border-transparent');
+                btnElement.classList.add('bg-indigo-50', 'text-indigo-700', 'font-semibold', 'border-indigo-200');
+                const activeIconBox = btnElement.querySelector('span');
+                if (activeIconBox) {
+                    activeIconBox.classList.remove('bg-slate-100', 'text-slate-600');
+                    activeIconBox.classList.add('bg-indigo-100', 'text-indigo-700');
+                }
+            }
+
+            // Torna in cima allo scroll del contenitore principale
+            const mainArea = document.getElementById('mainScrollArea');
+            if (mainArea) mainArea.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Cambio sotto-tab per i 3 Pilastri della Scheda 1
+        function switchPillar(pillarId, btnElement) {
+            document.querySelectorAll('.pillar-panel').forEach(p => p.classList.add('hidden'));
+            document.getElementById(pillarId).classList.remove('hidden');
+
+            document.querySelectorAll('.pillar-btn').forEach(b => {
+                b.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+                b.classList.add('bg-slate-100', 'text-slate-700');
+            });
+            btnElement.classList.remove('bg-slate-100', 'text-slate-700');
+            btnElement.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
+        }
+
+        // Selezione emozioni nel Check-in (Tab 1)
+        function toggleEmotion(btn) {
+            btn.classList.toggle('ring-2');
+            btn.classList.toggle('ring-indigo-500');
+            btn.classList.toggle('bg-indigo-50/40');
+        }
+
+        // Gestione "Mi ci rivedo" nelle Schede 1 e 2
+        function toggleResonance(btn, textLabel) {
+            const icon = btn.querySelector('i');
+            if (selectedResonances.has(textLabel)) {
+                selectedResonances.delete(textLabel);
+                btn.classList.remove('selected');
+                if (icon) {
+                    icon.classList.remove('fa-solid', 'fa-check');
+                    icon.classList.add('fa-regular', 'fa-bookmark');
+                }
+            } else {
+                selectedResonances.add(textLabel);
+                btn.classList.add('selected');
+                if (icon) {
+                    icon.classList.remove('fa-regular', 'fa-bookmark');
+                    icon.classList.add('fa-solid', 'fa-check');
+                }
+            }
+            updateResonanceUI();
+        }
+
+        function updateResonanceUI() {
+            document.getElementById('resonanceCount').textContent = selectedResonances.size;
+            const summaryContainer = document.getElementById('resonanceSummaryList');
+            
+            if (selectedResonances.size === 0) {
+                summaryContainer.innerHTML = '<em>Non hai ancora selezionato spunti con il pulsante "Mi ci rivedo" nelle schede precedenti. Puoi cliccarli in qualsiasi momento durante il colloquio.</em>';
+                return;
+            }
+
+            let html = '<ul class="space-y-2">';
+            selectedResonances.forEach(item => {
+                html += `
+                    <li class="flex items-start gap-2.5 bg-white p-3 rounded-lg border border-indigo-100 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-indigo-600 mt-0.5"></i>
+                        <span class="text-slate-800 font-medium">${item}</span>
+                    </li>
+                `;
+            });
+            html += '</ul>';
+            summaryContainer.innerHTML = html;
+        }
+
+        // Simulatore Metafora della Ferrari
+        function updateFerrariLoad(amount, message) {
+            currentFerrariLoad = Math.min(100, currentFerrariLoad + amount);
+            renderFerrariState(message);
+        }
+
+        function resetFerrariLoad() {
+            currentFerrariLoad = 25;
+            renderFerrariState('Hai svuotato la memoria di lavoro scrivendo tutto fuori dalla testa e scegliendo un solo micro-passo: il motore torna a girare fluido!');
+        }
+
+        function renderFerrariState(message) {
+            const bar = document.getElementById('ferrariLoadBar');
+            const badge = document.getElementById('ferrariStatusBadge');
+            const explanation = document.getElementById('ferrariExplanation');
+
+            bar.style.width = currentFerrariLoad + '%';
+            explanation.textContent = message;
+
+            bar.classList.remove('bg-emerald-500', 'bg-amber-500', 'bg-rose-500');
+            badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold border ';
+
+            if (currentFerrariLoad <= 50) {
+                bar.classList.add('bg-emerald-500');
+                badge.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/30');
+                badge.textContent = `Scrivania Mentale: Fluida (${currentFerrariLoad}%)`;
+            } else if (currentFerrariLoad <= 80) {
+                bar.classList.add('bg-amber-500');
+                badge.classList.add('bg-amber-500/20', 'text-amber-300', 'border-amber-500/30');
+                badge.textContent = `Affaticamento Esecutivo (${currentFerrariLoad}%)`;
+            } else {
+                bar.classList.add('bg-rose-500');
+                badge.classList.add('bg-rose-500/20', 'text-rose-300', 'border-rose-500/30');
+                badge.textContent = `SURRISCALDAMENTO: Task Paralysis (${currentFerrariLoad}%)`;
+            }
+        }
+
+        // Logica Verifica Mini-Quiz
+        function checkQuiz() {
+            const answers = {
+                q1: 'B',
+                q2: 'B',
+                q3: 'C',
+                q4: 'B'
+            };
+            
+            let score = 0;
+            const form = document.getElementById('quizForm');
+            const resultsDiv = document.getElementById('quizResults');
+            
+            document.querySelectorAll('.quiz-question').forEach(q => {
+                q.classList.remove('border-l-4', 'border-l-emerald-500', 'border-l-rose-500', 'bg-emerald-50/40', 'bg-rose-50/40');
+            });
+
+            for (let [question, correctAnswer] of Object.entries(answers)) {
+                const selected = form.querySelector(`input[name="${question}"]:checked`);
+                const container = document.getElementById(`${question}-container`);
+                
+                if (selected && selected.value === correctAnswer) {
+                    score++;
+                    container.classList.add('border-l-4', 'border-l-emerald-500', 'bg-emerald-50/40');
+                } else {
+                    container.classList.add('border-l-4', 'border-l-rose-500', 'bg-rose-50/40');
+                }
+            }
+
+            resultsDiv.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-200', 'bg-amber-50', 'border-amber-200');
+            
+            if (score === 4) {
+                resultsDiv.classList.add('bg-emerald-50', 'border-emerald-200');
+                resultsDiv.innerHTML = `
+                    <h4 class="text-xl font-bold text-emerald-900 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-emerald-600"></i> Eccellente! (${score}/4 risposte corrette)
+                    </h4>
+                    <p class="text-emerald-800 text-sm md:text-base leading-relaxed">
+                        Hai messo a fuoco i pilastri di questo primo incontro: l'ADHD nell'adulto non è mai pigrizia o mancanza di volontà, ma una specifica modalità di regolazione delle risorse attentive ed esecutive.
+                    </p>
+                `;
+            } else {
+                resultsDiv.classList.add('bg-amber-50', 'border-amber-200');
+                resultsDiv.innerHTML = `
+                    <h4 class="text-xl font-bold text-amber-900 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-lightbulb text-amber-600"></i> Buon lavoro! (${score}/4 risposte corrette)
+                    </h4>
+                    <p class="text-amber-800 text-sm mb-3">
+                        Rivediamo insieme i punti chiave per consolidare la lettura neurobiologica:
+                    </p>
+                    <ul class="list-disc pl-5 text-xs md:text-sm text-slate-700 space-y-1.5 bg-white p-4 rounded-xl border border-amber-200">
+                        <li><strong>Domanda 1 (B):</strong> In età adulta il rapporto è 1:1; nelle donne il disturbo è spesso mascherato e internalizzato.</li>
+                        <li><strong>Domanda 2 (B):</strong> L'iperattività adulta diventa prevalentemente mentale ("brain spinning"), tensione interna e micro-movimenti.</li>
+                        <li><strong>Domanda 3 (C):</strong> La paralisi del compito nasce dal sovraccarico della memoria di lavoro, non da pigrizia.</li>
+                        <li><strong>Domanda 4 (B):</strong> L'alto potenziale cognitivo permette di compensare per anni finché le richieste esecutive non diventano eccessive.</li>
+                    </ul>
+                `;
+            }
+            
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // =========================================================================
+        // FUNZIONE DI ESPORTAZIONE PDF CON TUTTE LE SEZIONI E SOTTO-PILAR APERTI
+        // =========================================================================
+        function exportFullStaticPDF() {
+            const btn = document.getElementById('btnDownloadFullPdf');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Apertura sezioni e creazione PDF...';
+
+            // Attiva temporaneamente la modalità statica che apre tutte le 4 schede e i 3 pilastri
+            document.body.classList.add('pdf-export-mode');
+            const element = document.getElementById('mainScrollArea');
+
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     'Incontro_1_Comprendere_ADHD_Miti_e_Realta.pdf',
+                image:        { type: 'jpeg', quality: 0.97 },
+                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollY: 0 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            if (typeof html2pdf !== 'undefined') {
+                html2pdf().set(opt).from(element).save().then(() => {
+                    document.body.classList.remove('pdf-export-mode');
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    showToast('PDF completo dell\'Incontro 1 generato con tutte le sezioni aperte!');
+                }).catch(err => {
+                    console.error('Errore generazione PDF:', err);
+                    document.body.classList.remove('pdf-export-mode');
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    window.print();
+                });
+            } else {
+                document.body.classList.remove('pdf-export-mode');
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+                window.print();
+            }
+        }
+
+        function showToast(msg) {
+            const box = document.getElementById('toastBox');
+            document.getElementById('toastText').textContent = msg;
+            box.classList.remove('hidden');
+            setTimeout(() => box.classList.add('hidden'), 3200);
+        }
+    </script>
+</body>
+</html>
